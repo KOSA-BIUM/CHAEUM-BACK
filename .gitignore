@@ -39,3 +39,4 @@ out/
 # 민감한 설정 파일 제외
 # Spring Boot의 주 설정 파일
 application.properties
+application.yml
