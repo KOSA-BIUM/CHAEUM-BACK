@@ -30,9 +30,17 @@ ext {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+//	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+	implementation 'com.fasterxml.uuid:java-uuid-generator:5.0.0'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
+	implementation 'com.oracle.database.jdbc:ojdbc8:19.3.0.0'
+	implementation 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// JUnit 5, AssertJ, Mockito 등이 포함.
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
