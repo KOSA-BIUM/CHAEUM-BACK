@@ -9,14 +9,66 @@
             RECOMMENDATION_ID,
             USER_ID,
             REQUEST_PROMPT,
-            RECOMMENDATION_REASON
+            RECOMMENDATION_REASON,
+            CREATED_AT
         )
         VALUES (
             #{recommendationId},
             #{userId},
             #{requestPrompt},
-            #{recommendationReason}
+            #{recommendationReason},
+            #{createdAt}
         )
     </insert>
+    
+    <resultMap id="RecommendationResultMap" type="com.bium.chaeum.infrastructure.mybatis.record.RecommendationRecord">
+        <id property="recommendationId" column="R_RECOMMENDATION_ID"/>
+        <result property="userId" column="R_USER_ID"/>
+        <result property="requestPrompt" column="R_REQUEST_PROMPT" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="recommendationReason" column="R_RECOMMENDATION_REASON"/>
+        <result property="createdAt" column="R_CREATED_AT"/>
+        <collection property="mealItems" ofType="com.bium.chaeum.infrastructure.mybatis.record.RecommendationMealItemRecord">
+            <id property="recommendationMealItemId" column="I_RECOMMENDATION_MEAL_ITEM_ID"/>
+            <result property="recommendationId" column="R_RECOMMENDATION_ID"/>
+            <result property="dayNumber" column="I_DAYNUMBER"/>
+            <result property="division" column="I_DIVISION"/>
+            <result property="name" column="I_NAME"/>
+            <result property="carbohydrate" column="I_CARBOHYDRATE"/>
+            <result property="protein" column="I_PROTEIN"/>
+            <result property="fat" column="I_FAT"/>
+            <result property="sodium" column="I_SODIUM"/>
+            <result property="calorie" column="I_CALORIE"/>
+        </collection>
+    </resultMap>
+
+    <select id="findLatestByUserId" resultMap="RecommendationResultMap" parameterType="java.lang.String">
+        <![CDATA[
+        SELECT
+            R.RECOMMENDATION_ID AS R_RECOMMENDATION_ID,
+            R.USER_ID AS R_USER_ID,
+            R.REQUEST_PROMPT AS R_REQUEST_PROMPT,
+            R.RECOMMENDATION_REASON AS R_RECOMMENDATION_REASON,
+            R.CREATED_AT AS R_CREATED_AT,
+
+            I.RECOMMENDATION_MEAL_ITEM_ID AS I_RECOMMENDATION_MEAL_ITEM_ID,
+            I.DAYNUMBER AS I_DAYNUMBER,
+            I.DIVISION AS I_DIVISION,
+            I.NAME AS I_NAME,
+            I.CARBOHYDRATE AS I_CARBOHYDRATE,
+            I.PROTEIN AS I_PROTEIN,
+            I.FAT AS I_FAT,
+            I.SODIUM AS I_SODIUM,
+            I.CALORIE AS I_CALORIE
+        FROM RECOMMENDATION R
+        JOIN RECOMMENDATION_MEAL_ITEM I ON R.RECOMMENDATION_ID = I.RECOMMENDATION_ID
+        WHERE R.RECOMMENDATION_ID = (
+            SELECT SUB.RECOMMENDATION_ID
+            FROM RECOMMENDATION SUB
+            WHERE SUB.USER_ID = #{userId}
+            ORDER BY SUB.CREATED_AT DESC
+            FETCH FIRST 1 ROWS ONLY
+        )
+        ]]>
+    </select>
 
 </mapper>

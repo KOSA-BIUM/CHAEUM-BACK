@@ -4,9 +4,6 @@ import org.springframework.stereotype.Repository;
 
 import com.bium.chaeum.domain.model.entity.RecommendationMealItem;
 import com.bium.chaeum.domain.model.repository.RecommendationMealItemRepository;
-import com.bium.chaeum.domain.model.vo.AiMealItem;
-import com.bium.chaeum.domain.model.vo.RecommendationId;
-import com.bium.chaeum.domain.model.vo.RecommendationMealItemId;
 import com.bium.chaeum.infrastructure.mybatis.mapper.RecommendationMealItemMapper;
 import com.bium.chaeum.infrastructure.mybatis.record.RecommendationMealItemRecord;
 
@@ -21,23 +18,6 @@ public class MyBatisRecommendationMealItemRepository implements RecommendationMe
 	@Override
 	public void save(RecommendationMealItem recommendationMealItem) {
 		mapper.insert(toRecord(recommendationMealItem));
-	}
-	
-	private RecommendationMealItem toDomain(RecommendationMealItemRecord record) {
-		AiMealItem aiMealItem = AiMealItem.reconstruct(
-                record.getDayNumber(),
-                record.getDivision(),
-                record.getName(),
-                record.getCarbohydrate(),
-                record.getProtein(),
-                record.getFat(),
-                record.getSodium(),
-                record.getCalorie()
-        );
-		
-		return RecommendationMealItem.reconstruct(RecommendationMealItemId.of(record.getRecommendationMealItemId()),
-				RecommendationId.of(record.getRecommendationId()),
-				aiMealItem);
 	}
 	
 	private RecommendationMealItemRecord toRecord(RecommendationMealItem recommendationMealItem) {

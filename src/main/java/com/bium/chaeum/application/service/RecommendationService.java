@@ -11,6 +11,7 @@ import com.bium.chaeum.domain.model.repository.RecommendationMealItemRepository;
 import com.bium.chaeum.domain.model.repository.RecommendationRepository;
 import com.bium.chaeum.domain.model.repository.UserRepository;
 import com.bium.chaeum.domain.model.vo.AiWeeklyMealItem;
+import com.bium.chaeum.domain.model.vo.UserId;
 import com.bium.chaeum.infrastructure.ai.adapter.OpenAiAdapter;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,25 @@ public class RecommendationService {
 	private final RecommendationRepository recommendationRepository;
 	private final RecommendationMealItemRepository recommendationMealItemRepository;
 	private final UserRepository userRepository;
+	
+	/**
+     * 특정 사용자의 가장 최근 식단 추천 기록을 조회합니다.
+     * @param userId 조회할 사용자 ID (현재는 임시 ID 사용)
+     * @return RecommendationResponse DTO
+     */
+    @Transactional(readOnly = true)
+    public RecommendationResponse getLatestRecommendation(String tempUserId) {
+        
+        // 1. 임시 User ID를 Domain ID로 변환 (실제로는 UserId VO를 사용해야 함)
+        UserId userId = UserId.of(tempUserId); 
+
+        // 2. Repository를 통해 최신 Recommendation Aggregate Root 조회
+        Recommendation recommendation = recommendationRepository.findLatestByUserId(userId)
+            .orElseThrow(() -> new IllegalArgumentException("조회된 식단 추천 기록이 없습니다."));
+
+        // 3. Domain Entity를 Application Response DTO로 변환하여 반환
+        return RecommendationResponse.from(recommendation);
+    }
 
 	@Transactional
     public RecommendationResponse executeRecommendation() {
