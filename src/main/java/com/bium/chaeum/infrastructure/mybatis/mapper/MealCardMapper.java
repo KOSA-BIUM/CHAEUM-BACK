@@ -14,6 +14,7 @@ public interface MealCardMapper {
 	List<MealCardRecord> selectByRecordDate(@Param("calendarId") String calendarId, @Param("recordDate") LocalDateTime recordDate);
 	List<MealCardRecord> selectByCalendarId(@Param("calendarId") String calendarId);
 	MealCardRecord selectByCalendarIdAndRecordDateAndDivision(@Param("calendarId") String calendarId, @Param("recordDate") LocalDateTime recordDate,  @Param("division") String division);
+	List<MealCardRecord> selectByPeriod(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 	
 	int insert(MealCardRecord mealCard);
 	int update(MealCardRecord mealCard);
