@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bium.chaeum.infrastructure.mybatis.mapper.MealCardMapper">
+
+    <resultMap id="MealCardMap" type="MealCardRecord">
+        <id property="mealCardId" column="MEAL_CARD_ID" />
+        <result property="calendarId" column="CALENDAR_ID" />
+        <result property="recordDate" column="RECORD_DATE" jdbcType="TIMESTAMP"/>
+        <result property="division" column="DIVISION" />
+    </resultMap>
+
+	<resultMap id="MealCardWithMealItemsMap" type="MealCardRecord" extends="MealCardMap">
+		<collection property="mealItems" ofType="MealItemRecord" notNullColumn="MI_MEAL_ITEM_ID">
+	        <id property="mealItemId" column="MI_MEAL_ITEM_ID" />
+	        <result property="mealCardId" column="MI_MEAL_CARD_ID" />
+	        <result property="name" column="MI_NAME" />
+	        <result property="ingredient" column="MI_INGREDIENT" />
+	        <result property="carbohydrate" column="MI_CARBOHYDRATE" />
+	        <result property="protein" column="MI_PROTEIN" />
+	        <result property="fat" column="MI_FAT" />
+	        <result property="sodium" column="MI_SODIUM" />
+	        <result property="calorie" column="MI_CALORIE" />
+		</collection>
+	</resultMap>
+
+	<select id="selectByMealCardId" parameterType="string" resultMap="MealCardMap">
+		SELECT
+			MEAL_CARD_ID,
+			CALENDAR_ID,
+			RECORD_DATE,
+			DIVISION
+		FROM
+			MEAL_CARD
+		WHERE
+			MEAL_CARD_ID = #{mealCardId} AND
+			ROWNUM = 1
+	</select>
+	
+	<select id="selectByRecordDate" resultMap="MealCardMap">
+		SELECT
+			MEAL_CARD_ID,
+			CALENDAR_ID,
+			RECORD_DATE,
+			DIVISION
+		FROM
+			MEAL_CARD
+		WHERE
+			CALENDAR_ID = #{calendarId} AND
+			RECORD_DATE = #{recordDate}
+	</select>
+	
+	<select id="selectByCalendarId" parameterType="string" resultMap="MealCardMap">
+		SELECT
+			MEAL_CARD_ID,
+			CALENDAR_ID,
+			RECORD_DATE,
+			DIVISION
+		FROM
+			MEAL_CARD
+		WHERE
+			CALENDAR_ID = #{calendarId}
+	</select>
+	
+	<select id="selectByCalendarIdAndRecordDateAndDivision" resultMap="MealCardWithMealItemsMap">
+		SELECT
+			mc.MEAL_CARD_ID,
+			mc.CALENDAR_ID,
+			mc.RECORD_DATE,
+			mc.DIVISION,
+			mi.MEAL_ITEM_ID AS MI_MEAL_ITEM_ID,
+			mi.MEAL_CARD_ID AS MI_MEAL_CARD_ID,
+			mi.NAME AS MI_NAME,
+			mi.INGREDIENT AS MI_INGREDIENT,
+			mi.CARBOHYDRATE AS MI_CARBOHYDRATE,
+			mi.PROTEIN AS MI_PROTEIN,
+			mi.FAT AS MI_FAT,
+			mi.SODIUM AS MI_SODIUM,
+			mi.CALORIE AS MI_CALORIE
+		FROM MEAL_CARD mc
+		LEFT JOIN MEAL_ITEM mi ON mc.MEAL_CARD_ID = mi.MEAL_CARD_ID
+		WHERE mc.CALENDAR_ID = #{calendarId} AND
+		  	  mc.RECORD_DATE = #{recordDate} AND
+		  	  mc.DIVISION = #{division}
+		ORDER BY mi.MEAL_ITEM_ID
+	</select>
+	
+	<insert id="insert" parameterType="com.bium.chaeum.infrastructure.mybatis.record.MealCardRecord">
+		INSERT INTO MEAL_CARD (
+			MEAL_CARD_ID,
+			CALENDAR_ID,
+			RECORD_DATE,
+			DIVISION
+		)
+		VALUES (
+			#{mealCardId}, 
+			#{calendarId}, 
+			#{recordDate},
+			#{division}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bium.chaeum.infrastructure.mybatis.record.MealCardRecord">
+		UPDATE MEAL_CARD SET 
+			CALENDAR_ID = #{calendarId},
+			RECORD_DATE = #{recordDate},
+			DIVISION = #{division}
+		WHERE 
+			MEAL_CARD_ID = #{mealCardId}
+	</update>
+	
+	<delete id="delete" parameterType="string">
+        DELETE FROM MEAL_CARD WHERE MEAL_CARD_ID = #{mealCardId}
+    </delete>
+</mapper>
