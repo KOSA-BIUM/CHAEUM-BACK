@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -182,16 +183,19 @@ public class SecurityConfig {
     @Bean
     OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
         return context -> {
-            // Access Token에만 커스텀 클레임 추가
+            // 1) Access Token에만 커스텀 클레임 추가
             if (!"access_token".equals(context.getTokenType().getValue())) return;
 
-            var principal = context.getPrincipal();
-            if (principal == null || principal.getName() == null) return;
+            // 2) client_credentials 등 클라이언트 자격 플로우는 skip
+            if (AuthorizationGrantType.CLIENT_CREDENTIALS.equals(context.getAuthorizationGrantType())) return;
 
-            // 사용자 주체일 때만 roles / name 주입 (client_credentials 등은 skip)
-            var authorities = principal.getAuthorities();
+            Authentication authentication = context.getPrincipal();
+            if (authentication == null || authentication.getName() == null) return;
+
+            // 3) 권한 → roles 클레임
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             if (authorities != null && !authorities.isEmpty()) {
-                var roles = authorities.stream()
+                List<String> roles = authorities.stream()
                         .map(GrantedAuthority::getAuthority)      // e.g. ROLE_USER
                         .filter(a -> a.startsWith("ROLE_"))
                         .map(a -> a.substring("ROLE_".length()))  // -> USER
@@ -200,10 +204,16 @@ public class SecurityConfig {
                 context.getClaims().claim("roles", roles);
             }
 
-            // 사용자 표시용 name(있으면)
-            var nameAttr = principal.getName();
-            context.getClaims().claim("name", nameAttr);
-            // 필요 시 추가 커스텀 클레임: context.getClaims().claim("tenantId", ...);
+            // 4) name 클레임 (표시용)
+            String usernameAttr = authentication.getName();
+            context.getClaims().claim("username", usernameAttr);
+
+            // 5) 내부 주체 꺼내서 CustomUserDetails 판별
+            Object userPrincipal = authentication.getPrincipal();
+            if (userPrincipal instanceof CustomUserDetails customUserDetails) {
+                String userId = customUserDetails.getUserId().value();
+                context.getClaims().claim("user_id", userId);
+            }
         };
     }
 

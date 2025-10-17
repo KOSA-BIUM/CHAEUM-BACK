@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -23,17 +24,23 @@ public class HealthCheckController {
     @GetMapping("/api/health/secure")
     public Map<String, Object> secureHealth(@AuthenticationPrincipal Jwt jwt, Authentication authentication) {
         // jwt가 null이면 Bearer 토큰 없이 들어온 것 (권장: 401)
-        String username = authentication.getName(); // subject와 동일할 가능성 큼
+        String username = authentication.getName();
         List<String> authorities = authentication.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority).sorted().toList();
+
+        Instant iat = jwt != null ? jwt.getIssuedAt() : null;
+        Instant exp = jwt != null ? jwt.getExpiresAt() : null;
+
+        // ★ user_id 클레임 안전하게 추출 (없을 수도 있으니 null-safe)
+        String userId = (jwt != null) ? jwt.getClaim("user_id") : null;
 
         return Map.of(
                 "status", "UP",
                 "user", username,
+                "userId", userId,
                 "authorities", authorities,
-                "tokenIssuedAt", jwt != null && jwt.getIssuedAt() != null ? jwt.getIssuedAt().toString() : null,
-                "tokenExpiresAt", jwt != null && jwt.getExpiresAt() != null ? jwt.getExpiresAt().toString() : null,
-                "claims", jwt != null ? jwt.getClaims() : Map.of()
+                "tokenIssuedAt", iat != null ? iat.toString() : null,
+                "tokenExpiresAt", exp != null ? exp.toString() : null
         );
     }
 }
