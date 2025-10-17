@@ -1,5 +1,7 @@
 package com.bium.chaeum.infrastructure.mybatis.repository;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.bium.chaeum.domain.model.entity.Recommendation;
@@ -23,11 +25,18 @@ public class MyBatisRecommendationRepository implements RecommendationRepository
 		
 	}
 	
+	@Override
+	public Optional<Recommendation> findLatestByUserId(UserId userId) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+	
 	private Recommendation toDomain(RecommendationRecord record) {
 		return Recommendation.reconstruct(RecommendationId.of(record.getRecommendationId()),
 				UserId.of(record.getUserId()),
 				record.getRequestPrompt(),
-				record.getRecommendationReason());
+				record.getRecommendationReason(),
+				record.getCreatedAt());
 	}
 	
 	private RecommendationRecord toRecord(Recommendation recommendation) {
@@ -36,6 +45,8 @@ public class MyBatisRecommendationRepository implements RecommendationRepository
 				.userId(recommendation.getUserId().value())
 				.requestPrompt(recommendation.getRequestPrompt())
 				.recommendationReason(recommendation.getRecommendationReason())
+				.createdAt(recommendation.getCreatedAt())
 				.build();
 	}
+
 }

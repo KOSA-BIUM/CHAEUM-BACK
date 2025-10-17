@@ -9,13 +9,15 @@
             RECOMMENDATION_ID,
             USER_ID,
             REQUEST_PROMPT,
-            RECOMMENDATION_REASON
+            RECOMMENDATION_REASON,
+            CREATED_AT
         )
         VALUES (
             #{recommendationId},
             #{userId},
             #{requestPrompt},
-            #{recommendationReason}
+            #{recommendationReason},
+            #{createdAt}
         )
     </insert>
 

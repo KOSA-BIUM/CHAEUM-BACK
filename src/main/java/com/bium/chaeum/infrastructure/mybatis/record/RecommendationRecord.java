@@ -1,5 +1,7 @@
 package com.bium.chaeum.infrastructure.mybatis.record;
 
+import java.time.LocalDateTime;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,5 +16,6 @@ public class RecommendationRecord {
 	private String userId;					// 유저 ID
 	private String requestPrompt;			// AI에게 보내는 사용자 프롬프트
 	private String recommendationReason;	// 식단 추천 이유
+	private LocalDateTime createdAt;		// 추천 일자
 	
 }
