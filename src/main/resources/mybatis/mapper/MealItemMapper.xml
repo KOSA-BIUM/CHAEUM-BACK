@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bium.chaeum.infrastructure.mybatis.mapper.MealItemMapper">
+
+    <resultMap id="MealItemMap" type="MealItemRecord">
+        <id property="mealItemId" column="MEAL_ITEM_ID" />
+		<result property="mealCardId" column="MEAL_CARD_ID" />
+        <result property="name" column="NAME" />
+        <result property="ingredient" column="INGREDIENT" />
+        <result property="carbohydrate" column="CARBOHYDRATE" />
+        <result property="protein" column="PROTEIN" />
+        <result property="fat" column="FAT" />
+        <result property="sodium" column="SODIUM" />
+        <result property="calorie" column="CALORIE" />
+    </resultMap>
+
+	<select id="selectByMealItemId" parameterType="string" resultMap="MealItemMap">
+		SELECT
+			MEAL_ITEM_ID,
+			MEAL_CARD_ID,
+			NAME,
+			INGREDIENT,
+			CARBOHYDRATE,
+			PROTEIN,
+			FAT,
+			SODIUM,
+			CALORIE			
+		FROM
+			MEAL_ITEM
+		WHERE
+			MEAL_ITEM_ID = #{mealItemId} AND
+			ROWNUM = 1
+	</select>
+	
+	<select id="selectByMealCardId" resultMap="MealItemMap">
+		SELECT
+			MEAL_ITEM_ID,
+			MEAL_CARD_ID,
+			NAME,
+			INGREDIENT,
+			CARBOHYDRATE,
+			PROTEIN,
+			FAT,
+			SODIUM,
+			CALORIE	
+		FROM
+			MEAL_ITEM
+		WHERE
+			MEAL_CARD_ID = #{mealCardId}			
+	</select>
+	
+	<insert id="insert" parameterType="com.bium.chaeum.infrastructure.mybatis.record.MealItemRecord">
+		INSERT INTO MEAL_ITEM (
+			MEAL_ITEM_ID,
+			MEAL_CARD_ID,
+			NAME,
+			INGREDIENT,
+			CARBOHYDRATE,
+			PROTEIN,
+			FAT,
+			SODIUM,
+			CALORIE	
+		)
+		VALUES (
+			#{mealItemId}, 
+			#{mealCardId}, 
+			#{name},
+			#{ingredient},
+			#{carbohydrate}, 
+			#{protein}, 
+			#{fat},
+			#{sodium},
+			#{calorie}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bium.chaeum.infrastructure.mybatis.record.MealItemRecord">
+		UPDATE MEAL_ITEM
+		<set>
+			<if test="mealCardId != null">MEAL_CARD_ID = #{mealCardId},</if>
+			<if test="name != null">NAME = #{name},</if>
+			<if test="ingredient != null">INGREDIENT = #{ingredient},</if>
+			<if test="carbohydrate != null">CARBOHYDRATE = #{carbohydrate},</if>
+			<if test="protein != null">PROTEIN = #{protein},</if>
+			<if test="fat != null">FAT = #{fat},</if>
+			<if test="sodium != null">SODIUM = #{sodium},</if>
+			<if test="calorie != null">CALORIE = #{calorie},</if>
+		</set>
+		WHERE 
+			MEAL_ITEM_ID = #{mealItemId}
+	</update>
+	
+	<delete id="delete" parameterType="string">
+        DELETE FROM MEAL_ITEM WHERE MEAL_ITEM_ID = #{mealItemId}
+    </delete>
+</mapper>
