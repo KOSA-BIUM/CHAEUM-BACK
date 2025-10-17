@@ -30,12 +30,18 @@ ext {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
-	implementation 'com.fasterxml.uuid:java-uuid-generator:5.0.0'
+
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
 	implementation 'com.oracle.database.jdbc:ojdbc8:19.3.0.0'
 	implementation 'com.h2database:h2'
+
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+	implementation 'com.fasterxml.uuid:java-uuid-generator:5.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
