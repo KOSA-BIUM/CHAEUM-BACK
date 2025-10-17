@@ -12,23 +12,21 @@ import com.bium.chaeum.application.response.RecommendationResponse;
 
 @SpringBootTest
 @Transactional
-public class RecommendationAppServiceTest {
+public class RecommendationAppServiceTest2 {
 
 	@Autowired
     private RecommendationService recommendationService;
 
-    // 주의: 이 테스트는 실제 외부 API 호출이 발생합니다.
-    @Test
-    @DisplayName("실제 AI 통신이 정상적으로 이루어지고 WeeklyMeal 객체로 변환되어야 한다")
-    void executeRecommendation_ShouldCallActualAiAndReturnObject() {
+	@Test
+    @DisplayName("최신 추천 기록 조회 시, Repository 결과를 응답 DTO로 변환하여 반환해야 한다.")
+    void getLatestRecommendation_ShouldReturnLatestRecord() {
         // Given (준비):
-        
+
         // When (실행):
-        RecommendationResponse result = recommendationService.executeRecommendation();
+        RecommendationResponse result = recommendationService.getLatestRecommendation("840335f2-ff80-4afb-a219-968bfb050dea");
 
         // Then (검증):
-        // 객체 변환 및 기본 구조가 정상적인지 확인
-        assertNotNull(result, "실제 AI 호출 결과가 null이 아니어야 합니다.");
+        assertNotNull(result, "조회 결과는 null이 아니어야 합니다.");
         System.out.println(result);
     }
 }

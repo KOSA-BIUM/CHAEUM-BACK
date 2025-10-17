@@ -1,13 +1,19 @@
 package com.bium.chaeum.infrastructure.mybatis.record;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * author: 이상우
  */
 @Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RecommendationMealItemRecord {
 
 	private String recommendationMealItemId;	// 식단음식 ID
