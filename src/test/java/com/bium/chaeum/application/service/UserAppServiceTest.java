@@ -8,13 +8,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
-//@Transactional
+@Transactional
 class UserAppServiceTest {
 
     @Autowired
@@ -37,14 +38,9 @@ class UserAppServiceTest {
         assertThat(userResponse.getUserId()).isNotBlank();
         assertThat(userRepository.existsByEmail(email)).isTrue();
 
-        Optional<UserResponse> auth = userAppService.authenticate(new LoginRequest(email, password));
-        assertThat(auth).isPresent();
-        assertThat(auth.get().getEmail()).isEqualTo(email);
+        UserResponse auth = userAppService.authenticate(new LoginRequest(email, password));
+        assertThat(auth).isNotNull();
+        assertThat(auth.getEmail()).isEqualTo(email);
     }
 
-//    @TestConfiguration
-//    static class SecurityTestConfig {
-//        @Bean
-//        PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
-//    }
 }
