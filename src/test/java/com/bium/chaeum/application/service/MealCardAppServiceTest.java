@@ -20,6 +20,7 @@ import com.bium.chaeum.application.request.SignUpRequest;
 import com.bium.chaeum.application.response.CalendarResponse;
 import com.bium.chaeum.application.response.MealCardResponse;
 import com.bium.chaeum.application.response.UserResponse;
+import com.bium.chaeum.domain.model.repository.MealCardRepository;
 import com.bium.chaeum.domain.shared.error.DomainException;
 
 @SpringBootTest
@@ -32,6 +33,8 @@ class MealCardAppServiceTest {
     private CalendarAppService calendarAppService;
     @Autowired
     private UserAppService userAppService;
+    @Autowired
+    private MealCardRepository mealCardRepository;
 
     private String userId;
     private String calendarId;
@@ -121,5 +124,45 @@ class MealCardAppServiceTest {
         assertThat(got).isPresent();
         assertThat(got.get().getMealItems()).hasSize(1);
         assertThat(got.get().getMealItems().get(0).getName()).isEqualTo("샐러드");
+    }
+    
+    @Test
+    @DisplayName("getByPeriod: using start and end")
+    void getByPeriod() {
+        // given
+    	LocalDateTime recordDate1 = LocalDateTime.of(2025, 10, 2, 8, 0);
+    	LocalDateTime recordDate2 = LocalDateTime.of(2025, 10, 3, 8, 0);
+        LocalDateTime start = LocalDateTime.of(2025, 10, 2, 8, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 10, 6, 8, 0);
+
+        MealCardWithItemsRequest req1 = MealCardWithItemsRequest.builder()
+        	.calendarId(calendarId)
+            .recordDate(recordDate1)
+            .division("BREAKFAST")
+            .items(List.of(
+                    MealItemCreateRequest.builder().name("오트밀").ingredient("귀리 60g, 우유 200ml").carbohydrate(50).protein(12).fat(6).sodium(200).calorie(300).build(),
+                    MealItemCreateRequest.builder().name("삶은 계란").ingredient("계란 2개").carbohydrate(2).protein(12).fat(10).sodium(120).calorie(140).build(),
+                    MealItemCreateRequest.builder().name("구운 계란").ingredient("계란 2개").carbohydrate(2).protein(12).fat(10).sodium(120).calorie(140).build()
+            ))
+            .build();
+        
+        MealCardWithItemsRequest req2 = MealCardWithItemsRequest.builder()
+        		.calendarId(calendarId)
+        		.recordDate(recordDate2)
+        		.division("LUNCH")
+        		.items(List.of(
+        				MealItemCreateRequest.builder().name("오트밀").ingredient("귀리 60g, 우유 200ml").carbohydrate(50).protein(12).fat(6).sodium(200).calorie(300).build(),
+        				MealItemCreateRequest.builder().name("삶은 계란").ingredient("계란 2개").carbohydrate(2).protein(12).fat(10).sodium(120).calorie(140).build(),
+        				MealItemCreateRequest.builder().name("구운 계란").ingredient("계란 2개").carbohydrate(2).protein(12).fat(10).sodium(120).calorie(140).build()
+        				))
+        		.build();
+        
+        // when
+        MealCardResponse res1 = mealCardAppService.createWithItemsByCalendarId(calendarId, req1);
+        MealCardResponse res2 = mealCardAppService.createWithItemsByCalendarId(calendarId, req2);
+        List<MealCardResponse> resPeriod = mealCardRepository.findListByPeriod(start,end).stream().map(MealCardResponse::from).toList();
+
+        // then
+        System.out.println("아아아ㅏㅇ앙아ㅏ아아아ㅏ아아아" + resPeriod);        
     }
 }
