@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bium.chaeum.infrastructure.mybatis.mapper.CalendarMapper">
+
+	<resultMap id="CalendarMap" type="CalendarRecord">
+        <id property="calendarId" column="CALENDAR_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="yearMonth" column="YEAR_MONTH" />
+    </resultMap>
+
+	<!-- Calendar with MealCards collection (JOIN-based) -->
+	<resultMap id="CalendarWithMealCardsMap" type="CalendarRecord" extends="CalendarMap">
+		<collection property="mealCards" ofType="MealCardRecord" notNullColumn="MC_MEAL_CARD_ID">
+			<id property="mealCardId" column="MC_MEAL_CARD_ID" />
+			<result property="calendarId" column="MC_CALENDAR_ID" />
+			<result property="recordDate" column="MC_RECORD_DATE" jdbcType="TIMESTAMP" />
+			<result property="division" column="MC_DIVISION" />
+		</collection>
+	</resultMap>
+
+	<select id="selectByCalendarId" parameterType="string" resultMap="CalendarMap">
+		SELECT
+			CALENDAR_ID,
+			USER_ID,
+			YEAR_MONTH
+		FROM
+			CALENDAR
+		WHERE
+			CALENDAR_ID = #{calendarId} AND
+			ROWNUM = 1
+	</select>
+	
+	<select id="selectByUserId" parameterType="string" resultMap="CalendarMap">
+		SELECT
+			CALENDAR_ID,
+			USER_ID,
+			YEAR_MONTH
+		FROM
+			CALENDAR
+		WHERE
+			USER_ID = #{userId} AND
+			ROWNUM = 1
+	</select>
+	
+	<select id="selectByUserIdAndYearMonth" resultMap="CalendarMap">
+		SELECT
+			CALENDAR_ID,
+			USER_ID,
+			YEAR_MONTH
+		FROM
+			CALENDAR
+		WHERE
+			USER_ID = #{userId} AND
+			YEAR_MONTH = #{yearMonth} AND
+			ROWNUM = 1
+	</select>
+
+	<!-- Calendar + MealCards by userId and yearMonth -->
+	<select id="selectWithMealCardsByUserIdAndYearMonth" resultMap="CalendarWithMealCardsMap">
+		SELECT
+			c.CALENDAR_ID,
+			c.USER_ID,
+			c.YEAR_MONTH,
+			mc.MEAL_CARD_ID   AS MC_MEAL_CARD_ID,
+			mc.CALENDAR_ID   AS MC_CALENDAR_ID,
+			mc.RECORD_DATE   AS MC_RECORD_DATE,
+			mc.DIVISION      AS MC_DIVISION
+		FROM CALENDAR c
+		LEFT JOIN MEAL_CARD mc ON mc.CALENDAR_ID = c.CALENDAR_ID
+		WHERE c.USER_ID = #{userId}
+		  AND c.YEAR_MONTH = #{yearMonth}
+		ORDER BY mc.RECORD_DATE, mc.DIVISION
+	</select>
+	
+	<insert id="insert" parameterType="com.bium.chaeum.infrastructure.mybatis.record.CalendarRecord">
+		INSERT INTO CALENDAR (
+			CALENDAR_ID,
+			USER_ID,
+			YEAR_MONTH
+		)
+		VALUES (
+			#{calendarId}, 
+			#{userId}, 
+			#{yearMonth}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bium.chaeum.infrastructure.mybatis.record.CalendarRecord">
+		UPDATE CALENDAR SET 
+			USER_ID = #{userId},
+			YEAR_MONTH = #{yearMonth}
+		WHERE 
+			CALENDAR_ID = #{calendarId}
+	</update>
+	
+</mapper>
