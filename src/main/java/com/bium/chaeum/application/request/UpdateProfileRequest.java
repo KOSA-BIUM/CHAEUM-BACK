@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateProfileRequest {
 
-    private String userId;
+//    private String userId;
     private Integer height;
     private Integer weight;
     private String preferredDiet;
