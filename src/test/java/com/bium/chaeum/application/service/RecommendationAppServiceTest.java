@@ -2,8 +2,6 @@ package com.bium.chaeum.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bium.chaeum.application.response.RecommendationResponse;
 
 @SpringBootTest
-//@Transactional
+@Transactional
 public class RecommendationAppServiceTest {
 
 	@Autowired
