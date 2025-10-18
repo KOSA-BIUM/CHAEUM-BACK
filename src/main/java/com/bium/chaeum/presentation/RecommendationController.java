@@ -6,10 +6,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bium.chaeum.application.request.RecommendationRequest;
 import com.bium.chaeum.application.response.RecommendationResponse;
 import com.bium.chaeum.application.service.RecommendationService;
 
@@ -28,15 +28,15 @@ public class RecommendationController {
      * 프론트엔드에서 전송된 startDate, endDate를 @RequestBody로 받습니다.
      */
     @PostMapping
-    public ResponseEntity<RecommendationResponse> recommendMeal(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<RecommendationResponse> recommendMeal(@AuthenticationPrincipal Jwt jwt, @RequestBody RecommendationRequest request) {
     	// 로그인한 유저 ID를 추출
     	String userId = (jwt != null) ? jwt.getClaim("user_id") : null;
     	
     	// 서비스 호출
     	RecommendationResponse response = recommendationService.executeRecommendation(
-        		userId
-//        		request.getStartDate(), // DTO에서 시작일 추출
-//        		request.getEndDate()   // DTO에서 종료일 추출
+        		userId,
+        		request.getStartDate(),
+        		request.getEndDate()
         );
     	
         // HTTP 200 OK와 함께 Response DTO 반환
