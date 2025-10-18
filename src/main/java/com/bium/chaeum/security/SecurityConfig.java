@@ -37,7 +37,6 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -48,10 +47,7 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Configuration(proxyBeanMethods = false)
 @EnableMethodSecurity
@@ -92,7 +88,8 @@ public class SecurityConfig {
         RequestMatcher authSessionMatcher = req -> {
             String ctx = req.getContextPath() == null ? "" : req.getContextPath();
             String uri = req.getRequestURI();
-            return uri.startsWith(ctx + "/api/auth/session/");
+            return uri.startsWith(ctx + "/api/auth/session/")
+                    || uri.equals(ctx + "/api/auth/signup");
         };
 
         http
@@ -221,10 +218,25 @@ public class SecurityConfig {
     private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthConverter() {
         var scopeConv = new JwtGrantedAuthoritiesConverter();
         scopeConv.setAuthorityPrefix("SCOPE_"); // scope → SCOPE_xxx
+
         return jwt -> {
-            Collection<GrantedAuthority> auths = new ArrayList<>(scopeConv.convert(jwt));
-            var roles = (Collection<String>) jwt.getClaims().getOrDefault("roles", List.of());
-            roles.stream().map(r -> "ROLE_" + r).map(SimpleGrantedAuthority::new).forEach(auths::add);
+            // 1) 기본 scope 권한
+            Collection<GrantedAuthority> auths = new ArrayList<>();
+            Collection<GrantedAuthority> scopeAuths = scopeConv.convert(jwt);
+            if (scopeAuths != null) auths.addAll(scopeAuths);
+
+            // 2) roles 클레임(예: ["USER","ADMIN"]) → ROLE_*
+            Object rolesClaim = jwt.getClaims().get("roles");
+            if (rolesClaim instanceof Collection<?> col) {
+                for (Object r : col) {
+                    if (r != null) {
+                        auths.add(new SimpleGrantedAuthority("ROLE_" + r.toString()));
+                    }
+                }
+            }
+            // 중복 제거
+            auths = new ArrayList<>(new LinkedHashSet<>(auths));
+
             return new JwtAuthenticationToken(jwt, auths, jwt.getSubject());
         };
     }

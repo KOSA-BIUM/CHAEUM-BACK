@@ -9,6 +9,7 @@ import com.bium.chaeum.domain.model.entity.Profile;
 import com.bium.chaeum.domain.model.repository.ProfileRepository;
 import com.bium.chaeum.domain.model.vo.UserId;
 import com.bium.chaeum.domain.shared.error.DomainException;
+import com.bium.chaeum.domain.shared.error.ProfileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,10 @@ public class ProfileAppService {
     private final ProfileRepository profileRepository;
 
     @Transactional
-    public ProfileResponse register(RegisterProfileRequest request) {
+    public ProfileResponse register(UserId userId, RegisterProfileRequest request) {
         if(request == null) throw new IllegalArgumentException("request is required");
 
-        Profile profile = Profile.create(UserId.of(request.getUserId()), request.getBirthDate(),
+        Profile profile = Profile.create(userId, request.getBirthDate(),
                 GenderType.valueOf(request.getGender()), request.getHeight(), request.getWeight(),
                 PreferredDietType.valueOf(request.getPreferredDiet()));
 
@@ -35,10 +36,10 @@ public class ProfileAppService {
     }
 
     @Transactional
-    public ProfileResponse update(UpdateProfileRequest request) {
+    public ProfileResponse update(UserId userId, UpdateProfileRequest request) {
         if(request == null) throw new IllegalArgumentException("request is required");
 
-        Profile profile = profileRepository.findById(UserId.of(request.getUserId()))
+        Profile profile = profileRepository.findById(userId)
                 .orElseThrow(() -> new DomainException("user profile not found"));
 
         profile.updateProfile(request.getHeight(), request.getWeight(),
@@ -51,6 +52,6 @@ public class ProfileAppService {
     @Transactional(readOnly = true)
     public ProfileResponse getProfile(UserId userId) {
         return profileRepository.findById(userId).map(ProfileResponse::from)
-                .orElseThrow(() -> new DomainException("user profile not found"));
+                .orElseThrow(() -> new ProfileNotFoundException(userId.value()));
     }
 }
