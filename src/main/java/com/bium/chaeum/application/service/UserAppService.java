@@ -36,16 +36,18 @@ public class UserAppService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserResponse> getByEmail(String email) {
+    public UserResponse getByEmail(String email) {
         if (email == null) throw new IllegalArgumentException("email is required");
-        return userRepository.findByEmail(email).map(UserResponse::from);
+        return userRepository.findByEmail(email).map(UserResponse::from)
+                .orElseThrow(() -> new DomainException("user not found"));
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserResponse> authenticate(LoginRequest request) {
+    public UserResponse authenticate(LoginRequest request) {
         if (request == null) throw new IllegalArgumentException("request is required");
         return userRepository.findByEmail(request.getEmail())
                 .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
-                .map(UserResponse::from);
+                .map(UserResponse::from)
+                .orElseThrow(() -> new DomainException("user not found"));
     }
 }

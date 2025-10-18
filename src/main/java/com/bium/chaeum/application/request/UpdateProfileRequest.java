@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpRequest {
+public class UpdateProfileRequest {
 
-    private String email;
-    private String password;
-    private String name;
+    private String userId;
+    private Integer height;
+    private Integer weight;
+    private String preferredDiet;
 }

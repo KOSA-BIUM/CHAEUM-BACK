@@ -13,6 +13,7 @@ public interface MealCardRepository {
 	List<MealCard> findListByRecordDate(CalendarId calendarId, LocalDateTime recordDate);
 	List<MealCard> findListByCalendarId(CalendarId calendarId);
 	Optional<MealCard> findByCalendarIdAndRecordDateAndDivision(CalendarId calendarId, LocalDateTime recordDate, String division);
+	List<MealCard> findListByPeriod(LocalDateTime start, LocalDateTime end);
 	
 	// UPSERT = 새 UUID면 insert, 아니면 update
     void save(MealCard mealCard);

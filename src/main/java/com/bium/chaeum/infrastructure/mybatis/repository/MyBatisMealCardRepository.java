@@ -54,6 +54,13 @@ public class MyBatisMealCardRepository implements MealCardRepository {
         MealCardRecord r = mapper.selectByCalendarIdAndRecordDateAndDivision(calendarId.value(), recordDate, division);
         return Optional.ofNullable(r).map(this::toEntity);
     }
+    
+    @Override
+    public List<MealCard> findListByPeriod(LocalDateTime start, LocalDateTime end) {
+        if (start == null) throw new IllegalArgumentException("start is required");
+        if (end == null) throw new IllegalArgumentException("end is required");
+        return mapper.selectByPeriod(start,end).stream().map(this::toEntity).collect(Collectors.toList());
+    }
 
     @Override
     public void save(MealCard mealCard) {
