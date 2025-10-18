@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class RegisterProfileRequest {
 
-    private String userId;
+//    private String userId;
     private LocalDate birthDate;
     private String gender;
     private Integer height;

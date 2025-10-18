@@ -46,7 +46,7 @@ class ProfileAppServiceTest {
                                        Integer weight,
                                        PreferredDietType preferred) {
         RegisterProfileRequest r = new RegisterProfileRequest();
-        r.setUserId(userId);
+//        r.setUserId(userId);
         r.setBirthDate(birthDate);
         r.setGender(gender.name());
         r.setHeight(height);
@@ -60,7 +60,7 @@ class ProfileAppServiceTest {
                                      Integer weight,
                                      PreferredDietType preferred) {
         UpdateProfileRequest r = new UpdateProfileRequest();
-        r.setUserId(userId);
+//        r.setUserId(userId);
         r.setHeight(height);
         r.setWeight(weight);
         r.setPreferredDiet(preferred.name());
@@ -77,7 +77,7 @@ class ProfileAppServiceTest {
         String uid = user.getId().value();
 
         // when: 프로필 등록
-        ProfileResponse created = profileAppService.register(
+        ProfileResponse created = profileAppService.register(user.getId(),
                 reg(uid, LocalDate.of(1991, 5, 8),
                         GenderType.MALE, 180, 77,
                         PreferredDietType.PROTEIN)
@@ -105,14 +105,14 @@ class ProfileAppServiceTest {
         User user = seedUser(username);
         String uid = user.getId().value();
 
-        profileAppService.register(
+        profileAppService.register(user.getId(),
                 reg(uid, LocalDate.of(1990, 1, 1),
                         GenderType.FEMALE, 162, 55,
                         PreferredDietType.LOW_CALORIE)
         );
 
         // when
-        ProfileResponse updated = profileAppService.update(
+        ProfileResponse updated = profileAppService.update(user.getId(),
                 upd(uid, 163, 54, PreferredDietType.LOW_SUGAR)
         );
 
@@ -129,7 +129,7 @@ class ProfileAppServiceTest {
 
         // FK 제약을 스키마에 뒀다면 DataIntegrityViolationException 기대
         assertThatThrownBy(() ->
-                profileAppService.register(
+                profileAppService.register(UserId.of(ghostUser),
                         reg(ghostUser, LocalDate.of(1995, 12, 1),
                                 GenderType.MALE, 170, 60,
                                 PreferredDietType.HEALTHY_AGING)

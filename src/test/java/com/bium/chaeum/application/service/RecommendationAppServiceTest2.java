@@ -21,9 +21,10 @@ public class RecommendationAppServiceTest2 {
     @DisplayName("최신 추천 기록 조회 시, Repository 결과를 응답 DTO로 변환하여 반환해야 한다.")
     void getLatestRecommendation_ShouldReturnLatestRecord() {
         // Given (준비):
+		String userId = "840335f2-ff80-4afb-a219-968bfb050dea";
 
         // When (실행):
-        RecommendationResponse result = recommendationService.getLatestRecommendation("840335f2-ff80-4afb-a219-968bfb050dea");
+        RecommendationResponse result = recommendationService.getLatestRecommendation(userId);
 
         // Then (검증):
         assertNotNull(result, "조회 결과는 null이 아니어야 합니다.");
