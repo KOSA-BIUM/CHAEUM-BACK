@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bium.chaeum.application.response.RecommendationResponse;
 import com.bium.chaeum.domain.model.entity.Recommendation;
 import com.bium.chaeum.domain.model.entity.RecommendationMealItem;
-import com.bium.chaeum.domain.model.entity.User;
 import com.bium.chaeum.domain.model.repository.RecommendationMealItemRepository;
 import com.bium.chaeum.domain.model.repository.RecommendationRepository;
 import com.bium.chaeum.domain.model.repository.UserRepository;
@@ -37,15 +36,21 @@ public class RecommendationService {
         UserId userId = UserId.of(tempUserId); 
 
         // 2. Repository를 통해 최신 Recommendation Aggregate Root 조회
+        // 기록이 없을 경우 예외를 던지는 대신 null을 반환합니다.
         Recommendation recommendation = recommendationRepository.findLatestByUserId(userId)
-            .orElseThrow(() -> new IllegalArgumentException("조회된 식단 추천 기록이 없습니다."));
+            .orElse(null);
+        
+        if (recommendation == null) {
+            // 2단계 분기 처리: 기록이 없는 경우 명확하게 null 반환
+            return null;
+        }
 
         // 3. Domain Entity를 Application Response DTO로 변환하여 반환
         return RecommendationResponse.from(recommendation);
     }
 
 	@Transactional
-    public RecommendationResponse executeRecommendation() {
+    public RecommendationResponse executeRecommendation(String userId) {
         
         // 1. 필요한 데이터 수집 및 프롬프트 문자열 생성
         String userPrompt = """
@@ -65,9 +70,7 @@ public class RecommendationService {
         AiWeeklyMealItem mealPlan = openAiAdapter.generateWeeklyDiet(SYSTEM_PROMPT, userPrompt);
         
         // 3. DB 저장 및 트랜잭션 로직 수행...
-        User user = User.create("test@gmail.com", "test", "test");
-        userRepository.save(user);
-        Recommendation recommendation = Recommendation.create(user.getId(), userPrompt, mealPlan.recommendationReason());
+        Recommendation recommendation = Recommendation.create(UserId.of(userId), userPrompt, mealPlan.recommendationReason());
         recommendationRepository.save(recommendation);
         for(int i = 0; i < mealPlan.meals().size(); i++) {
         	RecommendationMealItem recommendationMealItem = RecommendationMealItem.create(recommendation.getId(), mealPlan.meals().get(i));

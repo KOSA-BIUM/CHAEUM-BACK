@@ -22,9 +22,10 @@ public class RecommendationAppServiceTest {
     @DisplayName("실제 AI 통신이 정상적으로 이루어지고 WeeklyMeal 객체로 변환되어야 한다")
     void executeRecommendation_ShouldCallActualAiAndReturnObject() {
         // Given (준비):
+    	String userId = "3f45b6c1-b813-42cf-ae28-4b02ad23cfb0";
         
         // When (실행):
-        RecommendationResponse result = recommendationService.executeRecommendation();
+        RecommendationResponse result = recommendationService.executeRecommendation(userId);
 
         // Then (검증):
         // 객체 변환 및 기본 구조가 정상적인지 확인
