@@ -42,7 +42,7 @@ public class MealCardController {
 
     // Detail by mealCardId (with items)
     @GetMapping("/{mealCardId}")
-    public ResponseEntity<MealCardResponse> getMealCardDetail(@PathVariable String mealCardId) {
+    public ResponseEntity<MealCardResponse> getMealCardDetail(@PathVariable("mealCardId") String mealCardId) {
         Optional<MealCardResponse> res = mealCardAppService.getDetailByMealCardId(mealCardId);
         return res.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -67,7 +67,7 @@ public class MealCardController {
     // Composite update: meal card + items (full replacement of items)
     @PutMapping("/{mealCardId}")
     public ResponseEntity<MealCardResponse> updateWithItems(
-        @PathVariable String mealCardId,
+        @PathVariable("mealCardId") String mealCardId,
         @RequestBody MealCardWithItemsRequest request
     ) {
         MealCardResponse updated = mealCardAppService.updateWithItems(mealCardId, request);
@@ -76,7 +76,7 @@ public class MealCardController {
 
     // Delete a meal card
     @DeleteMapping("/{mealCardId}")
-    public ResponseEntity<Void> delete(@PathVariable String mealCardId) {
+    public ResponseEntity<Void> delete(@PathVariable("mealCardId") String mealCardId) {
         mealCardAppService.delete(mealCardId);
         return ResponseEntity.noContent().build();
     }
