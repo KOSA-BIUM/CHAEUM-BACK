@@ -3,10 +3,12 @@ package com.bium.chaeum.application.request;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class MealItemCreateRequest {
     private String mealItemId;   // null이면 새로 생성, 값이 있으면 업데이트
     private String name;        // 필수

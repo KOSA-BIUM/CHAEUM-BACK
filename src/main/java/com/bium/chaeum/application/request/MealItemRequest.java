@@ -3,10 +3,12 @@ package com.bium.chaeum.application.request;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class MealItemRequest {
     private String mealCardId;   // 대상 MealCard ID (생성 시 옵션, 업데이트 시 필수일 수 있음)
     private String name;

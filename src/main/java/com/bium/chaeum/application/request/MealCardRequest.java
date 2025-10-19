@@ -6,10 +6,12 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class MealCardRequest {
     private String calendarId;       // 필수: 소속 캘린더 ID
     private LocalDateTime recordDate; // 필수: 기록 일시

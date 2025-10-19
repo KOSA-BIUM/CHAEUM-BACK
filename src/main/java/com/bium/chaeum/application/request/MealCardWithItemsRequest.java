@@ -6,10 +6,12 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class MealCardWithItemsRequest {
     private String calendarId;       // 우선: 소속 캘린더 ID (없으면 아래 userId+yearMonth 사용)
     private String userId;           // 대안: 캘린더 미보유 시 사용자 ID

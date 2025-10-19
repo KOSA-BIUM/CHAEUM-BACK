@@ -39,7 +39,7 @@ public class MealItemController {
     // Update
     @PutMapping("/{mealItemId}")
     public ResponseEntity<MealItemResponse> update(
-        @PathVariable String mealItemId,
+        @PathVariable("mealItemId") String mealItemId,
         @RequestBody MealItemRequest request
     ) {
         MealItemResponse updated = mealItemAppService.update(mealItemId, request);
@@ -48,14 +48,14 @@ public class MealItemController {
 
     // Delete
     @DeleteMapping("/{mealItemId}")
-    public ResponseEntity<Void> delete(@PathVariable String mealItemId) {
+    public ResponseEntity<Void> delete(@PathVariable("mealItemId") String mealItemId) {
         mealItemAppService.delete(mealItemId);
         return ResponseEntity.noContent().build();
     }
 
     // Get one
     @GetMapping("/{mealItemId}")
-    public ResponseEntity<MealItemResponse> getById(@PathVariable String mealItemId) {
+    public ResponseEntity<MealItemResponse> getById(@PathVariable("mealItemId") String mealItemId) {
         Optional<MealItemResponse> res = mealItemAppService.getByMealItemId(mealItemId);
         return res.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
