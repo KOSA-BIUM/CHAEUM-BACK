@@ -11,6 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * author: 이상우
+ */
 @Builder
 @Data
 @AllArgsConstructor

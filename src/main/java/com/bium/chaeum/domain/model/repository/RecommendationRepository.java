@@ -5,6 +5,9 @@ import java.util.Optional;
 import com.bium.chaeum.domain.model.entity.Recommendation;
 import com.bium.chaeum.domain.model.vo.UserId;
 
+/**
+ * author: 이상우
+ */
 public interface RecommendationRepository {
 
 	void save(Recommendation recommendation);

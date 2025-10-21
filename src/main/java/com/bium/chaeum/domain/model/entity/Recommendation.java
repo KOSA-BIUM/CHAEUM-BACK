@@ -8,6 +8,9 @@ import com.bium.chaeum.domain.model.vo.UserId;
 
 import lombok.Getter;
 
+/**
+ * author: 이상우
+ */
 @Getter
 public class Recommendation {
 

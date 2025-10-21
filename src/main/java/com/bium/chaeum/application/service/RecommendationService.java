@@ -23,6 +23,9 @@ import com.bium.chaeum.infrastructure.ai.adapter.OpenAiAdapter;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * author: 이상우
+ */
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {

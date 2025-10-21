@@ -6,6 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.bium.chaeum.infrastructure.mybatis.record.RecommendationRecord;
 
+/**
+ * author: 이상우
+ */
 @Mapper
 public interface RecommendationMapper {
 

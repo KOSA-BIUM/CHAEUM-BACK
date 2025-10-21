@@ -18,6 +18,9 @@ import com.bium.chaeum.infrastructure.mybatis.record.RecommendationRecord;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * author: 이상우
+ */
 @Repository
 @RequiredArgsConstructor
 public class MyBatisRecommendationRepository implements RecommendationRepository {
@@ -36,6 +39,7 @@ public class MyBatisRecommendationRepository implements RecommendationRepository
 		return recordOptional.map(this::toDomainWithMealItems);
 	}
 	
+	// record -> domain
 	private Recommendation toDomainWithMealItems(RecommendationRecord record) {
 		Recommendation recommendation = Recommendation.reconstruct(
 				RecommendationId.of(record.getRecommendationId()),
@@ -55,6 +59,7 @@ public class MyBatisRecommendationRepository implements RecommendationRepository
 		return recommendation;
 	}
 	
+	// record -> domain
 	private RecommendationMealItem toMealItemDomain(RecommendationMealItemRecord record) {
 			
 			AiMealItem aiMealItem = AiMealItem.reconstruct(
@@ -74,6 +79,7 @@ public class MyBatisRecommendationRepository implements RecommendationRepository
 					aiMealItem);
 	}
 	
+	// domain -> record
 	private RecommendationRecord toRecord(Recommendation recommendation) {
 		return RecommendationRecord.builder()
 				.recommendationId(recommendation.getId().value())

@@ -6,6 +6,9 @@ import com.bium.chaeum.domain.model.vo.RecommendationMealItemId;
 
 import lombok.Getter;
 
+/**
+ * author: 이상우
+ */
 @Getter
 public class RecommendationMealItem {
 	

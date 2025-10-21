@@ -15,6 +15,10 @@ import com.bium.chaeum.application.service.RecommendationService;
 
 import lombok.RequiredArgsConstructor;
 
+
+/**
+ * author: 이상우
+ */
 @RestController
 @RequestMapping("/api/recommendations")
 @RequiredArgsConstructor

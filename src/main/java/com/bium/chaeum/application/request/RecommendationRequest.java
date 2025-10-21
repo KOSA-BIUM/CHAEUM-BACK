@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/**
+ * author: 이상우
+ */
 @Builder
 @Data
 @NoArgsConstructor

@@ -29,6 +29,7 @@ public class UserController {
     @PostMapping("/signup")
     @Transactional
     public ResponseEntity<UserResponse> signUp(@RequestBody @Valid SignUpRequest request) {
+    	System.out.println("회원가입 실행 -------------");
         UserResponse created = userAppService.register(request);
         // Location 헤더에 신규 리소스 위치 힌트(선택)
         return ResponseEntity

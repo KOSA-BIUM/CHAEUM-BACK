@@ -2,6 +2,9 @@ package com.bium.chaeum.domain.model.vo;
 
 import java.util.List;
 
+/**
+ * author: 이상우
+ */
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 //AI 응답의 최상위 구조 (7일치 식단 목록 포함)

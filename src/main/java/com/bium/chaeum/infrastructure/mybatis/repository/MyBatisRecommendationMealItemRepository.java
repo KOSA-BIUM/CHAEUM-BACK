@@ -9,6 +9,10 @@ import com.bium.chaeum.infrastructure.mybatis.record.RecommendationMealItemRecor
 
 import lombok.RequiredArgsConstructor;
 
+
+/**
+ * author: 이상우
+ */
 @Repository
 @RequiredArgsConstructor
 public class MyBatisRecommendationMealItemRepository implements RecommendationMealItemRepository {
@@ -20,6 +24,7 @@ public class MyBatisRecommendationMealItemRepository implements RecommendationMe
 		mapper.insert(toRecord(recommendationMealItem));
 	}
 	
+	// domain -> record
 	private RecommendationMealItemRecord toRecord(RecommendationMealItem recommendationMealItem) {
 		return RecommendationMealItemRecord.builder()
 				.recommendationMealItemId(recommendationMealItem.getId().value())

@@ -3,6 +3,9 @@ package com.bium.chaeum.domain.model.vo;
 import com.bium.chaeum.domain.model.entity.MealCardType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * author: 이상우
+ */
 //AI가 응답할 식단의 상세 구조
 public record AiMealItem(
 		// required = true를 명시하여 JSON 스키마에 이 필드가 필수로 포함되도록 강제
