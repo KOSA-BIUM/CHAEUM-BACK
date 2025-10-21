@@ -21,12 +21,14 @@ import com.bium.chaeum.infrastructure.mybatis.record.MealCardRecord;
 
 import lombok.RequiredArgsConstructor;
 
+// MyBatisCalendarRepository는 Calendar 엔티티에 대한 MyBatis 기반의 리포지토리 구현체입니다. (author: 나규태 + ChatGPT)
 @Repository
 @RequiredArgsConstructor
 public class MyBatisCalendarRepository implements CalendarRepository {
 
     private final CalendarMapper mapper;
 
+    // CalendarId로 Calendar를 찾습니다.
     @Override
     public Optional<Calendar> findByCalendarId(CalendarId id) {
         if (id == null) throw new IllegalArgumentException("id is required");
@@ -34,6 +36,7 @@ public class MyBatisCalendarRepository implements CalendarRepository {
         return Optional.ofNullable(r).map(this::toEntityShallow);
     }
 
+    // UserId로 Calendar를 찾습니다.
     @Override
     public Optional<Calendar> findByUserId(UserId userId) {
         if (userId == null) throw new IllegalArgumentException("userId is required");
@@ -41,6 +44,7 @@ public class MyBatisCalendarRepository implements CalendarRepository {
         return Optional.ofNullable(r).map(this::toEntityShallow);
     }
 
+    // UserId와 yearMonth로 Calendar를 찾습니다.
     @Override
     public Optional<Calendar> findByUserIdAndYearMonth(UserId userId, String yearMonth) {
         if (userId == null) throw new IllegalArgumentException("userId is required");
@@ -51,6 +55,7 @@ public class MyBatisCalendarRepository implements CalendarRepository {
         return Optional.of(toEntityWithMealCards(r));
     }
 
+    // Calendar를 저장합니다.
     @Override
     public void save(Calendar calendar) {
         if (calendar == null) throw new IllegalArgumentException("calendar is required");
@@ -73,6 +78,7 @@ public class MyBatisCalendarRepository implements CalendarRepository {
         );
     }
 
+    //  MealCards도 포함하여 매핑
     private Calendar toEntityWithMealCards(CalendarRecord r) {
         List<MealCard> cards = new ArrayList<>();
         if (r.getMealCards() != null) {
@@ -96,6 +102,7 @@ public class MyBatisCalendarRepository implements CalendarRepository {
         );
     }
 
+    // Calendar 엔티티를 CalendarRecord로 매핑
     private CalendarRecord toRecord(Calendar e) {
         List<MealCardRecord> mealCardRecords = null; // Calendar insert/update doesn't cascade mealcards here
         return CalendarRecord.builder()

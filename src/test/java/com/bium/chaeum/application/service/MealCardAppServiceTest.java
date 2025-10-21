@@ -23,6 +23,7 @@ import com.bium.chaeum.application.response.UserResponse;
 import com.bium.chaeum.domain.model.repository.MealCardRepository;
 import com.bium.chaeum.domain.shared.error.DomainException;
 
+// MealCardAppServiceTest는 MealCardAppService의 주요 기능들을 테스트합니다. (author: 나규태 + ChatGPT)
 @SpringBootTest
 @Transactional
 class MealCardAppServiceTest {
@@ -40,6 +41,7 @@ class MealCardAppServiceTest {
     private String calendarId;
     private final String yearMonth = "2025-10";
 
+    // 테스트를 위한 사용자 및 캘린더 설정
     @BeforeEach
     void setUpUser() {
         String email = "test+" + java.util.UUID.randomUUID() + "@local";
@@ -58,6 +60,7 @@ class MealCardAppServiceTest {
         this.calendarId = cal.getCalendarId();
     }
 
+    //  식사 기록 카드를 기존 캘린더 ID를 사용하여 생성하는 테스트
     @Test
     @DisplayName("createWithItemsByCalendarId: create using existing calendarId")
     void createWithItemsByCalendarId_success() {
@@ -86,6 +89,7 @@ class MealCardAppServiceTest {
         assertThat(res.getMealItems()).hasSize(3);
     }
 
+    // 중복 생성 테스트
     @Test
     @DisplayName("createWithItems: duplicate (calendarId, recordDate, division) throws DomainException")
     void createWithItems_duplicate_throws() {
@@ -105,6 +109,7 @@ class MealCardAppServiceTest {
             .isInstanceOf(DomainException.class);
     }
 
+    //  식사 기록 카드 상세 조회 테스트
     @Test
     @DisplayName("getDetailByMealCardId: returns mealcard with items")
     void getDetail_returns_items() {
@@ -126,6 +131,7 @@ class MealCardAppServiceTest {
         assertThat(got.get().getMealItems().get(0).getName()).isEqualTo("샐러드");
     }
     
+    // 기간을 사용한 식사 기록 카드 조회 테스트
     @Test
     @DisplayName("getByPeriod: using start and end")
     void getByPeriod() {

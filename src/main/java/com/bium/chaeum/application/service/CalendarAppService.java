@@ -17,6 +17,7 @@ import com.bium.chaeum.domain.shared.error.DomainException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+// CalendarAppService는 캘린더 관련 비즈니스 로직을 처리하는 서비스 클래스입니다. (author: 나규태)
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,18 +25,21 @@ public class CalendarAppService {
 
     private final CalendarRepository calendarRepository;
 
+    // 특정 캘린더 아이디를 사용한 조회
     @Transactional(readOnly = true)
     public Optional<CalendarResponse> getByCalendarId(String calendarId) {
         if (calendarId == null || calendarId.isBlank()) throw new IllegalArgumentException("calendarId is required");
         return calendarRepository.findByCalendarId(CalendarId.of(calendarId)).map(CalendarResponse::from);
     }
 
+    // 특정 사용자 아이디를 사용한 조회
     @Transactional(readOnly = true)
     public Optional<CalendarResponse> getByUserId(String userId) {
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
         return calendarRepository.findByUserId(UserId.of(userId)).map(CalendarResponse::from);
     }
 
+    // 특정 사용자 아이디 및 연월을 사용한 조회
     @Transactional(readOnly = true)
     public Optional<CalendarResponse> getByUserIdAndYearMonth(String userId, String yearMonth) {
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
@@ -43,12 +47,14 @@ public class CalendarAppService {
         return calendarRepository.findByUserIdAndYearMonth(UserId.of(userId), yearMonth).map(CalendarResponse::from);
     }
 
+    // 캘린더 생성 또는 업데이트
     @Transactional
     public CalendarResponse createOrUpdate(CalendarRequest request) {
         // Backward-compatible wrapper. Prefer ensureExists() for intent clarity.
         return ensureExists(request);
     }
 
+    // 캘린더 존재 보장 (없으면 생성)
     @Transactional
     public CalendarResponse ensureExists(CalendarRequest request) {
         if (request == null) throw new IllegalArgumentException("request is required");
@@ -61,6 +67,7 @@ public class CalendarAppService {
         return CalendarResponse.from(calendar);
     }
 
+    // 캘린더 생성
     @Transactional
     public CalendarResponse create(CalendarRequest request) {
         if (request == null) throw new IllegalArgumentException("request is required");
@@ -78,6 +85,7 @@ public class CalendarAppService {
         return CalendarResponse.from(created);
     }
 
+    // 캘린더 업데이트 (연월 변경)
     @Transactional
     public CalendarResponse update(String calendarId, String newYearMonth) {
         if (calendarId == null || calendarId.isBlank()) throw new IllegalArgumentException("calendarId is required");

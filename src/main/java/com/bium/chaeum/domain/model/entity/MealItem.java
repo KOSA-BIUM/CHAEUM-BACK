@@ -5,6 +5,7 @@ import com.bium.chaeum.domain.model.vo.MealItemId;
 
 import lombok.Getter;
 
+// MealItem 엔티티는 특정 식사 기록에 포함된 개별 식사 항목을 나타냅니다. (author: 나규태)
 @Getter
 public class MealItem {
 	private MealItemId id;

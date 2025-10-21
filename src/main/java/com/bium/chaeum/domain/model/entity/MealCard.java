@@ -8,6 +8,7 @@ import com.bium.chaeum.domain.model.vo.MealCardId;
 
 import lombok.Getter;
 
+// MealCard 엔티티는 특정 날짜와 식사 구분에 해당하는 식사 기록을 나타냅니다. (author: 나규태)
 @Getter
 public class MealCard {
 	private MealCardId id;

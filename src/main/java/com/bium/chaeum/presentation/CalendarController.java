@@ -16,6 +16,7 @@ import com.bium.chaeum.domain.shared.error.DomainException;
 
 import lombok.RequiredArgsConstructor;
 
+// CalendarController는 캘린더 관련 API 엔드포인트를 처리합니다. (author: 나규태 + ChatGPT)
 @RestController
 @RequestMapping("/api/calendar")
 @RequiredArgsConstructor
@@ -33,14 +34,13 @@ public class CalendarController {
         return res.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Note: Calendar creation is handled implicitly by MealCard creation when needed.
-
     // Basic error mapping
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    // Domain error mapping
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<String> handleDomainConflict(DomainException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.bium.chaeum.infrastructure.mybatis.record.MealCardRecord;
 
+// MealCardMapper는 식사 카드 데이터에 대한 MyBatis 매퍼 인터페이스로, 데이터베이스와의 상호작용을 정의합니다. (author: 나규태)
 @Mapper
 public interface MealCardMapper {
 	MealCardRecord selectByMealCardId(@Param("mealCardId") String mealCardId);

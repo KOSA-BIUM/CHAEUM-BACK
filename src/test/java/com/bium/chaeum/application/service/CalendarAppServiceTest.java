@@ -21,6 +21,7 @@ import com.bium.chaeum.application.response.MealCardResponse;
 import com.bium.chaeum.application.response.UserResponse;
 import com.bium.chaeum.domain.shared.error.DomainException;
 
+// CalendarAppServiceTest는 CalendarAppService의 주요 기능들을 테스트합니다. (author: 나규태 + ChatGPT)
 @SpringBootTest
 @Transactional
 class CalendarAppServiceTest {
@@ -34,6 +35,7 @@ class CalendarAppServiceTest {
 
     private String userId;
 
+    // 테스트를 위한 사용자 설정
     @BeforeEach
     void setUpUser() {
         String email = "test+" + java.util.UUID.randomUUID() + "@local";
@@ -47,6 +49,7 @@ class CalendarAppServiceTest {
         this.userId = userResponse.getUserId();
     }
 
+    // 캘린더가 없으면 생성하고 반환하는지 확인
     @Test
     @DisplayName("ensureExists: creates calendar if missing and returns it")
     void ensureExists_creates() {
@@ -65,6 +68,7 @@ class CalendarAppServiceTest {
         assertThat(res.getCalendarId()).isNotBlank();
     }
 
+    // 중복 생성 테스트
     @Test
     @DisplayName("create: duplicate (userId, yearMonth) throws DomainException")
     void create_duplicate_throws() {
@@ -85,6 +89,7 @@ class CalendarAppServiceTest {
             	.isInstanceOf(DomainException.class);
     }
 
+    // 캘린더의 연월을 변경하는 테스트
     @Test
     @DisplayName("update: change yearMonth with conflict detection")
     void update_conflict_detection() {
@@ -108,6 +113,7 @@ class CalendarAppServiceTest {
             .isInstanceOf(DomainException.class);
     }
 
+    // 특정 사용자의 특정 연월에 해당하는 식사 기록들을 조회하는 테스트
     @Test
     @DisplayName("listByUserIdAndYearMonth: returns mealcards for month via JOIN")
     void list_month_mealcards() {
