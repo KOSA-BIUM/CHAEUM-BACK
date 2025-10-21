@@ -26,6 +26,7 @@ import com.bium.chaeum.domain.shared.error.DomainException;
 
 import lombok.RequiredArgsConstructor;
 
+// MealCardAppService는 식사 기록(MealCard) 관련 비즈니스 로직을 처리하는 서비스 클래스입니다. (author: 나규태 + ChatGPT)
 @Service
 @RequiredArgsConstructor
 public class MealCardAppService {
@@ -34,20 +35,21 @@ public class MealCardAppService {
     private final MealItemRepository mealItemRepository;
     private final CalendarAppService calendarAppService;
 
-    // Basic getters
+    // 특정 mealCardId를 사용한 조회
     @Transactional(readOnly = true)
     public Optional<MealCardResponse> getByMealCardId(String mealCardId) {
         if (mealCardId == null || mealCardId.isBlank()) throw new IllegalArgumentException("mealCardId is required");
         return mealCardRepository.findByMealCardId(MealCardId.of(mealCardId)).map(MealCardResponse::from);
     }
 
+    // 특정 캘린더 아이디를 사용한 목록 조회
     @Transactional(readOnly = true)
     public List<MealCardResponse> listByCalendarId(String calendarId) {
         if (calendarId == null || calendarId.isBlank()) throw new IllegalArgumentException("calendarId is required");
         return mealCardRepository.findListByCalendarId(CalendarId.of(calendarId)).stream().map(MealCardResponse::from).toList();
     }
 
-    // For calendar page: list only the mealCards for the month
+    // 특정 사용자 아이디 및 연월을 사용한 목록 조회
     @Transactional(readOnly = true)
     public List<MealCardResponse> listByUserIdAndYearMonth(String userId, String yearMonth) {
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
@@ -57,6 +59,7 @@ public class MealCardAppService {
                      .orElse(List.of());
     }
 
+    // 특정 캘린더 아이디, 기록 일시, 구분을 사용한 조회
     @Transactional(readOnly = true)
     public Optional<MealCardResponse> getByCalendarIdAndRecordDateAndDivision(String calendarId, LocalDateTime recordDate, String division) {
         if (calendarId == null || calendarId.isBlank()) throw new IllegalArgumentException("calendarId is required");
@@ -65,7 +68,7 @@ public class MealCardAppService {
         return mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(calendarId), recordDate, division).map(MealCardResponse::from);
     }
 
-    // Detail view by mealCardId (loads items using a second query)
+    // 상세 조회 (아이템 포함)
     @Transactional(readOnly = true)
     public Optional<MealCardResponse> getDetailByMealCardId(String mealCardId) {
         if (mealCardId == null || mealCardId.isBlank()) throw new IllegalArgumentException("mealCardId is required");
@@ -76,7 +79,7 @@ public class MealCardAppService {
         return withItems.map(MealCardResponse::from).or(()->base.map(MealCardResponse::from));
     }
 
-    // Create a MealCard; if calendar for userId+yearMonth doesn't exist, create it first
+    //  기본 생성 (아이템 없음)
     @Transactional
     public MealCardResponse create(String userId, String yearMonth, MealCardRequest request) {
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
@@ -85,17 +88,17 @@ public class MealCardAppService {
         if (request.getRecordDate() == null) throw new IllegalArgumentException("recordDate is required");
         if (request.getDivision() == null || request.getDivision().isBlank()) throw new IllegalArgumentException("division is required");
 
-        // 1) Ensure calendar exists (idempotent)
+        // 기존 캘린더가 존재 하는지 확인 및 생성
         var calRes = calendarAppService.ensureExists(CalendarRequest.builder().userId(userId).yearMonth(yearMonth).build());
         String calendarId = calRes.getCalendarId();
 
-        // 2) Guard: duplication per (calendarId, recordDate, division)
+        // 중복 방지
         Optional<MealCard> dup = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(calendarId), request.getRecordDate(), request.getDivision());
         if (dup.isPresent()) {
             throw new DomainException("MealCard already exists for recordDate=" + request.getRecordDate() + ", division=" + request.getDivision());
         }
 
-        // 3) Create and persist
+        // mealCard 생성
         MealCard created = MealCard.create(
             CalendarId.of(calendarId),
             request.getRecordDate(),
@@ -106,7 +109,7 @@ public class MealCardAppService {
         return MealCardResponse.from(created);
     }
     
-    // Variant: Use existing calendarId directly (recommended after calendar page loads)
+    // 캘린더 아이디를 사용한 생성 (아이템 포함)
     @Transactional
     public MealCardResponse createWithItemsByCalendarId(String calendarId, MealCardWithItemsRequest request) {
         if (calendarId == null || calendarId.isBlank()) throw new IllegalArgumentException("calendarId is required");
@@ -114,17 +117,19 @@ public class MealCardAppService {
         if (request.getRecordDate() == null) throw new IllegalArgumentException("recordDate is required");
         if (request.getDivision() == null || request.getDivision().isBlank()) throw new IllegalArgumentException("division is required");
 
-        // Optional: verify calendar existence (and ownership if needed)
+        // 캘린더 존재 확인
         var calOpt = calendarAppService.getByCalendarId(calendarId);
         if (calOpt.isEmpty()) {
             throw new DomainException("Calendar not found: " + calendarId);
         }
 
+        // 중복 방지
         var dup = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(calendarId), request.getRecordDate(), request.getDivision());
         if (dup.isPresent()) {
             throw new DomainException("MealCard already exists for recordDate=" + request.getRecordDate() + ", division=" + request.getDivision());
         }
 
+        // 기본 mealCard 생성
         MealCard created = MealCard.create(
             CalendarId.of(calendarId),
             request.getRecordDate(),
@@ -133,6 +138,7 @@ public class MealCardAppService {
         );
         mealCardRepository.save(created);
 
+        // 아이템 생성 (있을 경우)
         if (request.getItems() != null && !request.getItems().isEmpty()) {
             for (MealItemCreateRequest itemReq : request.getItems()) {
                 if (itemReq == null) continue;
@@ -151,12 +157,13 @@ public class MealCardAppService {
             }
         }
 
+        // 최종 생성된 mealCard (아이템 포함) 조회 및 반환
         var withItems = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(calendarId), request.getRecordDate(), request.getDivision())
             .orElse(created);
         return MealCardResponse.from(withItems);
     }
 
-    // Variant: Use userId + yearMonth (when calendarId is not yet known)
+    // 캘린더 아이디를 사용하지 않은 생성 (아이템 포함)
     @Transactional
     public MealCardResponse createWithItems(String userId, String yearMonth, MealCardWithItemsRequest request) {
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
@@ -165,17 +172,17 @@ public class MealCardAppService {
         if (request.getRecordDate() == null) throw new IllegalArgumentException("recordDate is required");
         if (request.getDivision() == null || request.getDivision().isBlank()) throw new IllegalArgumentException("division is required");
 
-        // 1) Ensure calendar exists (idempotent)
+        // 기존 캘린더 존재 확인 및 생성
         var calRes = calendarAppService.ensureExists(CalendarRequest.builder().userId(userId).yearMonth(yearMonth).build());
         String calendarId = calRes.getCalendarId();
 
-        // 2) Duplicate guard
+        // 중복 방지
         var dup = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(calendarId), request.getRecordDate(), request.getDivision());
         if (dup.isPresent()) {
             throw new DomainException("MealCard already exists for recordDate=" + request.getRecordDate() + ", division=" + request.getDivision());
         }
 
-        // 3) Create base meal card
+        // 기본 mealCard 생성
         MealCard created = MealCard.create(
             CalendarId.of(calendarId),
             request.getRecordDate(),
@@ -184,7 +191,7 @@ public class MealCardAppService {
         );
         mealCardRepository.save(created);
 
-        // 4) Create items if present
+        // 아이템 생성 (있을 경우)
         if (request.getItems() != null && !request.getItems().isEmpty()) {
             for (MealItemCreateRequest itemReq : request.getItems()) {
                 if (itemReq == null) continue;
@@ -203,20 +210,23 @@ public class MealCardAppService {
             }
         }
 
+        // 최종 생성된 mealCard (아이템 포함) 조회 및 반환
         var withItems = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(calendarId), request.getRecordDate(), request.getDivision())
             .orElse(created);
         return MealCardResponse.from(withItems);
     }
 
+    // 단순 업데이트 (아이템 미포함)
     @Transactional
     public MealCardResponse update(String mealCardId, MealCardRequest request) {
         if (mealCardId == null || mealCardId.isBlank()) throw new IllegalArgumentException("mealCardId is required");
         if (request == null) throw new IllegalArgumentException("request is required");
 
+        // 기존 mealCard 조회
         MealCard existing = mealCardRepository.findByMealCardId(MealCardId.of(mealCardId))
                 .orElseThrow(() -> new DomainException("MealCard not found: " + mealCardId));
 
-        // Apply new values (all are required fields for MealCard)
+        // 업데이트할 필드 계산 (null이면 기존 값 유지)
         String newDivision = request.getDivision() != null ? request.getDivision() : existing.getDivision().name();
         LocalDateTime newRecordDate = request.getRecordDate() != null ? request.getRecordDate() : existing.getRecordDate();
         String newCalendarId = request.getCalendarId() != null ? request.getCalendarId() : existing.getCalendarId().value();
@@ -232,24 +242,27 @@ public class MealCardAppService {
         return MealCardResponse.from(updated);
     }
 
+    // 삭제
     @Transactional
     public void delete(String mealCardId) {
         if (mealCardId == null || mealCardId.isBlank()) throw new IllegalArgumentException("mealCardId is required");
         mealCardRepository.delete(MealCardId.of(mealCardId));
     }
 
+    // null 안전 처리를 위한 헬퍼 메서드
     private Integer toPrimitive(Integer v) { return v == null ? 0 : v; }
 
-    // Composite update: update meal card fields, optionally move to another calendar, and fully replace items list
+    // 복합 업데이트: meal card + items (아이템 전체 교체)
     @Transactional
     public MealCardResponse updateWithItems(String mealCardId, MealCardWithItemsRequest request) {
         if (mealCardId == null || mealCardId.isBlank()) throw new IllegalArgumentException("mealCardId is required");
         if (request == null) throw new IllegalArgumentException("request is required");
 
+        // 기존 mealCard 조회
         MealCard existing = mealCardRepository.findByMealCardId(MealCardId.of(mealCardId))
             .orElseThrow(() -> new DomainException("MealCard not found: " + mealCardId));
 
-        // 1) Resolve target calendar (stay, explicit calendarId, or ensure via userId+yearMonth)
+        // 삭제 및 생성에 대비한 캘린더 아이디 결정
         String targetCalendarId = existing.getCalendarId().value();
         if (request.getUserId() != null && !request.getUserId().isBlank()
                 && request.getYearMonth() != null && !request.getYearMonth().isBlank()) {
@@ -257,18 +270,18 @@ public class MealCardAppService {
             targetCalendarId = cal.getCalendarId();
         }
 
-        // 2) Compute new card fields (null → keep existing)
+        // 업데이트할 필드 계산 (null이면 기존 값 유지)
         LocalDateTime newRecordDate = request.getRecordDate() != null ? request.getRecordDate() : existing.getRecordDate();
         String newDivision = request.getDivision() != null && !request.getDivision().isBlank() ? request.getDivision() : existing.getDivision().name();
 
-        // 3) Duplicate guard on target calendar
+        // 중복 방지
         var conflict = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(targetCalendarId), newRecordDate, newDivision)
             .filter(mc -> !mc.getId().value().equals(existing.getId().value()));
         if (conflict.isPresent()) {
             throw new DomainException("MealCard already exists for recordDate=" + newRecordDate + ", division=" + newDivision);
         }
 
-        // 4) Update base meal card
+        // mealCard 업데이트
         MealCard updated = MealCard.reconstruct(
             existing.getId(),
             CalendarId.of(targetCalendarId),
@@ -278,15 +291,15 @@ public class MealCardAppService {
         );
         mealCardRepository.save(updated);
 
-        // 5) Replace items if provided (full replacement semantics)
+        // 아이템 전체 교체 처리
         if (request.getItems() != null) {
             // Load current items
             var currentItems = mealItemRepository.findByMealCardId(updated.getId());
             var currentById = currentItems.stream().collect(Collectors.toMap(i -> i.getId().value(), i -> i));
-
-            // Track seen IDs to detect deletions
+            
             Set<String> seen = new HashSet<>();
 
+            // mealItems 처리 (생성, 수정)
             for (MealItemCreateRequest ir : request.getItems()) {
                 if (ir == null) continue;
                 if (ir.getMealItemId() == null || ir.getMealItemId().isBlank()) {
@@ -336,7 +349,7 @@ public class MealCardAppService {
                 }
             }
 
-            // delete missing items (those not seen)
+            // 남은 아이템 삭제
             for (MealItem old : currentItems) {
                 if (!seen.contains(old.getId().value())) {
                     mealItemRepository.delete(old.getId());
@@ -344,7 +357,7 @@ public class MealCardAppService {
             }
         }
 
-        // 6) Return fresh view (with items)
+        // 최종 업데이트된 mealCard (아이템 포함) 조회 및 반환
         var withItems = mealCardRepository.findByCalendarIdAndRecordDateAndDivision(CalendarId.of(targetCalendarId), newRecordDate, newDivision)
             .orElse(updated);
         return MealCardResponse.from(withItems);

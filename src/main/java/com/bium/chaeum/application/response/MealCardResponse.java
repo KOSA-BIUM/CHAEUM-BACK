@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+// MealCardResponse는 특정 식사 기록(MealCard)의 세부 정보를 응답으로 반환할 때 사용됩니다. (author: 나규태)
 @Builder
 @Data
 @AllArgsConstructor

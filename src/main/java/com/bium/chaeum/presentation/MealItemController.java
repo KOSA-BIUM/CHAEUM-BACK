@@ -22,6 +22,7 @@ import com.bium.chaeum.application.service.MealItemAppService;
 
 import lombok.RequiredArgsConstructor;
 
+// MealItemController는 식사 항목 관련 API 엔드포인트를 처리합니다. (author: 나규태 + ChatGPT)
 @RestController
 @RequestMapping("/api/mealItem")
 @RequiredArgsConstructor

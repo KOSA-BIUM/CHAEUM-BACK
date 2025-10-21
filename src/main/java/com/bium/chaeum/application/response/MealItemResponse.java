@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+// MealItemResponse는 특정 식사 항목(MealItem)의 세부 정보를 응답으로 반환할 때 사용됩니다. (author: 나규태)
 @Builder
 @Data
 @AllArgsConstructor

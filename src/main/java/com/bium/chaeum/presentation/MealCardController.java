@@ -26,6 +26,7 @@ import com.bium.chaeum.domain.shared.error.DomainException;
 
 import lombok.RequiredArgsConstructor;
 
+// MealCardController는 식사 기록 카드 관련 API 엔드포인트를 처리합니다. (author: 나규태 + ChatGPT)
 @RestController
 @RequestMapping("/api/mealCard")
 @RequiredArgsConstructor
@@ -33,14 +34,14 @@ public class MealCardController {
 
     private final MealCardAppService mealCardAppService;
 
-    // List meal cards for a calendar (monthly view uses calendarId)
+    // List by calendarId (monthly view uses calendarId)
     @GetMapping
     public ResponseEntity<List<MealCardResponse>> listByCalendarId(@RequestParam("calendarId") String calendarId) {
         List<MealCardResponse> list = mealCardAppService.listByCalendarId(calendarId);
         return ResponseEntity.ok(list);
     }
 
-    // Detail by mealCardId (with items)
+    // Get detail by mealCardId
     @GetMapping("/{mealCardId}")
     public ResponseEntity<MealCardResponse> getMealCardDetail(@PathVariable("mealCardId") String mealCardId) {
         Optional<MealCardResponse> res = mealCardAppService.getDetailByMealCardId(mealCardId);
@@ -48,8 +49,6 @@ public class MealCardController {
     }
 
     // Create a meal card (and items).
-    // If request.calendarId is present → use it.
-    // Else if userId + yearMonth are present → ensure calendar then create.
     @PostMapping
     public ResponseEntity<MealCardResponse> create(@RequestBody MealCardWithItemsRequest request) {
         MealCardResponse created;

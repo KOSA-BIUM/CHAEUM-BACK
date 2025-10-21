@@ -16,12 +16,14 @@ import com.bium.chaeum.domain.model.vo.MealItemId;
 
 import lombok.RequiredArgsConstructor;
 
+// MealItemAppService는 식사 항목(MealItem)에 대한 생성, 수정, 삭제, 조회 기능을 제공합니다. (author: 나규태 + ChatGPT)
 @Service
 @RequiredArgsConstructor
 public class MealItemAppService {
 
     private final MealItemRepository mealItemRepository;
 
+    // 식사 항목 생성
     @Transactional
     public MealItemResponse create(MealItemRequest request) {
         if (request == null) throw new IllegalArgumentException("request is required");
@@ -42,6 +44,7 @@ public class MealItemAppService {
         return MealItemResponse.from(item);
     }
 
+    // 식사 항목 수정
     @Transactional
     public MealItemResponse update(String mealItemId, MealItemRequest request) {
         if (mealItemId == null) throw new IllegalArgumentException("mealItemId is required");
@@ -74,18 +77,21 @@ public class MealItemAppService {
         return MealItemResponse.from(merged);
     }
 
+    // 식사 항목 삭제
     @Transactional
     public void delete(String mealItemId) {
         if (mealItemId == null) throw new IllegalArgumentException("mealItemId is required");
         mealItemRepository.delete(MealItemId.of(mealItemId));
     }
 
+    // 식사 항목 단건 조회
     @Transactional(readOnly = true)
     public Optional<MealItemResponse> getByMealItemId(String mealItemId) {
         if (mealItemId == null) throw new IllegalArgumentException("mealItemId is required");
         return mealItemRepository.findByMealItemId(MealItemId.of(mealItemId)).map(MealItemResponse::from);
     }
 
+    // 특정 MealCard에 속한 식사 항목 목록 조회
     @Transactional(readOnly = true)
     public List<MealItemResponse> listByMealCardId(String mealCardId) {
         if (mealCardId == null) throw new IllegalArgumentException("mealCardId is required");
@@ -95,6 +101,7 @@ public class MealItemAppService {
                 .collect(Collectors.toList());
     }
 
+    // null 안전한 Integer 변환 헬퍼
     private Integer toPrimitive(Integer v) {
         return v == null ? 0 : v;
     }

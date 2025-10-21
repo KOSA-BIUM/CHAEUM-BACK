@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+// CalendarResponse는 특정 사용자의 특정 연월에 해당하는 캘린더와 그 안의 식사 기록들을 응답으로 반환할 때 사용됩니다. (author: 나규태)
 @Builder
 @Data
 @AllArgsConstructor

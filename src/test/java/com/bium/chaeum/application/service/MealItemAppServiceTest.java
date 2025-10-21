@@ -24,6 +24,7 @@ import com.bium.chaeum.application.response.UserResponse;
 import com.bium.chaeum.domain.model.repository.MealItemRepository;
 import com.bium.chaeum.domain.model.vo.MealItemId;
 
+// MealItemAppServiceTest는 MealItemAppService의 주요 기능들을 테스트합니다. (author: 나규태 + ChatGPT)
 @SpringBootTest
 @Transactional
 class MealItemAppServiceTest {
@@ -44,6 +45,7 @@ class MealItemAppServiceTest {
     private String mealCardId;
     private final String yearMonth = "2025-10";
 
+    // 테스트를 위한 사용자 및 캘린더 설정
     @BeforeEach
     void setUpUser() {
         String email = "test+" + java.util.UUID.randomUUID() + "@local";
@@ -72,6 +74,7 @@ class MealItemAppServiceTest {
         this.mealCardId = mcr.getMealCardId();
     }
 
+    // 식사 항목 생성 테스트
     @Test
     @DisplayName("create: valid request → save called and response mapped")
     void create_success() {
@@ -100,6 +103,7 @@ class MealItemAppServiceTest {
 	    assertThat(mealItemRepository.findByMealItemId(MealItemId.of(res.getMealItemId()))).isPresent();
     }
 
+    // 식사 항목 업데이트 테스트
     @Test
     @DisplayName("update: merge nulls → keep existing values, save called")
     void update_merge_success() {
@@ -131,6 +135,7 @@ class MealItemAppServiceTest {
         assertThat(res.getCalorie()).isEqualTo(100);
     }
 
+    // 식사 항목 삭제 테스트
     @Test
     @DisplayName("delete: calls repository.delete")
     void delete_calls_repo() {
@@ -148,6 +153,7 @@ class MealItemAppServiceTest {
     ).isNotPresent();
     }
 
+    // 식사 항목 조회 테스트
     @Test
     @DisplayName("getByMealItemId: present → mapped to response")
     void get_present() {
@@ -167,6 +173,7 @@ class MealItemAppServiceTest {
         assertThat(got.get().getName()).isEqualTo("Milk");
     }
 
+    // 식사 카드 ID로 식사 항목 목록 조회 테스트
     @Test
     @DisplayName("listByMealCardId: returns mapped list")
     void list_by_mealcard() {
